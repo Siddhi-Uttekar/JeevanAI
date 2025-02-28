@@ -39,6 +39,8 @@ export async function POST(request: Request) {
         recommendations,
       })
     } catch (error) {
+      console.log("Calling API...");
+
       console.error("Error with Hugging Face API:", error)
       // Fallback to mock data if the API call fails
       return NextResponse.json({

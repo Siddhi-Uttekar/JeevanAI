@@ -7,6 +7,8 @@ export async function analyzeSymptoms(data: {
 }) {
   try {
     // Use a relative URL that works in both development and production
+    console.log("Calling API...");
+
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/analyze-symptoms`, {
       method: "POST",
       headers: {
