@@ -11,7 +11,7 @@ app = Flask(__name__)
 # Initialize the symptom classifier model from Hugging Face
 try:
     symptom_classifier = pipeline(
-        "text-classification", 
+        "text-classification",
         model="facebook/bart-large-mnli",
         device=-1  # Use CPU
     )
@@ -29,21 +29,21 @@ def analyze_symptoms():
     symptoms = data.get("symptoms", "")
     age = data.get("age", 0)
     gender = data.get("gender", "")
-    
+
     if not symptoms:
         return jsonify({"error": "No symptoms provided"}), 400
-    
+
     try:
         # Use the Hugging Face model to classify symptoms
         # In a real app, you would use a medical-specific model
         if symptom_classifier:
             # Define potential conditions to check against
             potential_conditions = [
-                "migraine", "common cold", "flu", "covid-19", 
+                "migraine", "common cold", "flu", "covid-19",
                 "allergies", "anxiety", "depression", "hypertension",
                 "diabetes", "arthritis"
             ]
-            
+
             # Check symptoms against each condition
             results = []
             for condition in potential_conditions:
@@ -51,24 +51,24 @@ def analyze_symptoms():
                     f"The symptoms '{symptoms}' are related to {condition}",
                     candidate_labels=["yes", "no"]
                 )
-                
+
                 if prediction[0]["labels"][0] == "yes":
                     score = prediction[0]["scores"][0]
                     results.append({"name": condition.title(), "probability": score})
-            
+
             # Sort by probability
             results = sorted(results, key=lambda x: x["probability"], reverse=True)
-            
+
             # If no conditions matched well, provide a generic response
             if not results or results[0]["probability"] < 0.6:
                 results = [{"name": "Unspecified Condition", "probability": 0.5}]
-                
+
             # Limit to top 3
             results = results[:3]
-            
+
             # Generate recommendations based on top condition
             recommendations = generate_recommendations(results[0]["name"], age, gender)
-            
+
             return jsonify({
                 "conditions": results,
                 "recommendations": recommendations
@@ -79,9 +79,9 @@ def analyze_symptoms():
                 "conditions": [
                     {"name": "Symptom analysis unavailable", "probability": 1.0}
                 ],
-                "recommendations": [
-                    "Please consult with a healthcare professional  1.0}
-                ],
+                # "recommendations": [
+                #     "Please consult with a healthcare professional  1.0}
+                # ],
                 "recommendations": [
                     "Please consult with a healthcare professional for an accurate diagnosis",
                     "Consider visiting an urgent care facility if symptoms are severe",
@@ -97,46 +97,46 @@ def find_doctors():
     data = request.json
     condition = data.get("condition", "").lower()
     location = data.get("location", "")
-    
+
     if not condition or not location:
         return jsonify({"error": "Condition and location are required"}), 400
-    
+
     try:
         # In a real app, you would query MongoDB for doctors
         # Here we'll filter our mock database
-        
+
         # Get coordinates for the provided location
         geolocator = Nominatim(user_agent="mediscan-ai")
         user_location = geolocator.geocode(location)
-        
+
         if not user_location:
             return jsonify({"error": "Location not found"}), 400
-            
+
         user_coords = (user_location.latitude, user_location.longitude)
-        
+
         # Filter doctors by specialty related to condition
         specialties = get_specialties_for_condition(condition)
         matching_doctors = []
-        
+
         for doctor in doctors_db:
             if doctor["specialty"].lower() in specialties:
                 # Calculate distance
                 doc_coords = (doctor["latitude"], doctor["longitude"])
                 distance = geodesic(user_coords, doc_coords).miles
-                
+
                 # Add distance to doctor object
                 doctor_copy = doctor.copy()
                 doctor_copy["distance"] = round(distance, 1)
                 doctor_copy["distance_text"] = f"{round(distance, 1)} miles"
-                
+
                 matching_doctors.append(doctor_copy)
-        
+
         # Sort by distance
         matching_doctors.sort(key=lambda x: x["distance"])
-        
+
         # Return top 5 closest doctors
         return jsonify(matching_doctors[:5])
-        
+
     except Exception as e:
         print(f"Error finding doctors: {e}")
         return jsonify({"error": "Failed to find doctors"}), 500
@@ -149,7 +149,7 @@ def generate_recommendations(condition, age, gender):
         "Track your symptoms and their frequency",
         "Stay hydrated and get adequate rest"
     ]
-    
+
     condition_specific = {
         "Migraine": [
             "Avoid known trigger foods like chocolate or aged cheese",
@@ -177,16 +177,16 @@ def generate_recommendations(condition, age, gender):
             "Use air purifiers to reduce indoor allergens"
         ]
     }
-    
+
     # Get condition-specific recommendations if available
     specific_recs = condition_specific.get(condition, [])
-    
+
     # Combine recommendations
     if specific_recs:
         return specific_recs + general_recommendations[:1]
     else:
         return general_recommendations
-        
+
 def get_specialties_for_condition(condition):
     """Map conditions to relevant medical specialties"""
     condition_map = {
@@ -206,20 +206,19 @@ def get_specialties_for_condition(condition):
         "pregnancy": ["obstetrician", "gynecologist"],
         "child": ["pediatrician"]
     }
-    
+
     # Find matching specialties
     specialties = set()
     for key, values in condition_map.items():
         if key in condition:
             specialties.update(values)
-    
+
     # Default to primary care if no matches
     if not specialties:
         specialties = ["primary care"]
-    
+
     return specialties
 
 if __name__ == "__main__":
     # This is used when running locally
     app.run(host="127.0.0.1", port=5328, debug=True)
-

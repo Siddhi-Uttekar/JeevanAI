@@ -31,33 +31,13 @@ export default function SymptomChecker() {
     setError(null)
 
     try {
-      // For development testing, use mock data if the API call fails
-      try {
-        // Call the server action to analyze symptoms
-        const result = await analyzeSymptoms({
-          symptoms,
-          age: Number.parseInt(age),
-          gender,
-        })
+      const result = await analyzeSymptoms({
+        symptoms,
+        age: Number.parseInt(age),
+        gender,
+      })
 
-        setResults(result)
-      } catch (err) {
-        console.error("API call failed, using mock data:", err)
-        // Mock data for development/demo purposes
-        setResults({
-          conditions: [
-            { name: "Migraine", probability: 0.85 },
-            { name: "Stress", probability: 0.72 },
-            { name: "Dehydration", probability: 0.65 },
-          ],
-          recommendations: [
-            "Avoid known trigger foods like chocolate or aged cheese",
-            "Consider keeping a headache journal",
-            "Reduce exposure to bright lights and loud noises during episodes",
-            "Consult with a healthcare professional for proper diagnosis",
-          ],
-        })
-      }
+      setResults(result)
     } catch (err) {
       setError("An error occurred while analyzing symptoms. Please try again.")
       console.error(err)

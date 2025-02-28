@@ -2,94 +2,66 @@ import { NextResponse } from "next/server"
 import { HfInference } from "@huggingface/inference"
 
 // Initialize the Hugging Face client
-// Note: In production, you should use an environment variable for the API key
-const hf = new HfInference(process.env.HUGGINGFACE_API_KEY || "")
-
-// Define potential conditions to check against
-const potentialConditions = [
-  "migraine",
-  "common cold",
-  "flu",
-  "covid-19",
-  "allergies",
-  "anxiety",
-  "depression",
-  "hypertension",
-  "diabetes",
-  "arthritis",
-]
+const hf = new HfInference('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')
 
 export async function POST(request: Request) {
+  console.log("API route hit") // Add this line
   try {
     const data = await request.json()
-    const { symptoms, age, gender } = data
+    console.log("Received data:", data) // Add this line
+    const { symptoms } = data
 
     if (!symptoms) {
       return NextResponse.json({ error: "No symptoms provided" }, { status: 400 })
     }
 
-    // Use a zero-shot classification model to analyze symptoms
-    // This is a simplified approach - in production you'd use a medical-specific model
-    const results = []
-
     try {
-      // If we have a Hugging Face API key, use the model
-      if (process.env.HUGGINGFACE_API_KEY) {
-        for (const condition of potentialConditions) {
-          const response = await hf.textClassification({
-            model: "facebook/bart-large-mnli",
-            inputs: `The symptoms '${symptoms}' are related to ${condition}`,
-            parameters: {
-              candidateLabels: ["yes", "no"],
-            },
-          })
+      // Use the Zabihin/Symptom_to_Diagnosis model
+      const response = await hf.textClassification({
+        model: "Zabihin/Symptom_to_Diagnosis",
+        inputs: symptoms,
+      })
 
-          if (response.labels[0] === "yes") {
-            results.push({
-              name: condition.charAt(0).toUpperCase() + condition.slice(1),
-              probability: response.scores[0],
-            })
-          }
-        }
-      } else {
-        // If no API key, use mock data for demonstration
-        results.push(
-          { name: "Migraine", probability: 0.85 },
-          { name: "Stress", probability: 0.72 },
-          { name: "Dehydration", probability: 0.65 },
-        )
-      }
+      // Process the response
+      const conditions = response.map((result) => ({
+        name: result.label,
+        probability: result.score,
+      }))
+
+      // Sort conditions by probability
+      conditions.sort((a, b) => b.probability - a.probability)
+
+      // Generate recommendations based on top condition
+      const recommendations = generateRecommendations(conditions[0].name)
+
+      return NextResponse.json({
+        conditions: conditions.slice(0, 3), // Return top 3 conditions
+        recommendations,
+      })
     } catch (error) {
       console.error("Error with Hugging Face API:", error)
       // Fallback to mock data if the API call fails
-      results.push(
-        { name: "Migraine", probability: 0.85 },
-        { name: "Stress", probability: 0.72 },
-        { name: "Dehydration", probability: 0.65 },
-      )
+      return NextResponse.json({
+        conditions: [
+          { name: "Migraine", probability: 0.85 },
+          { name: "Stress", probability: 0.72 },
+          { name: "Dehydration", probability: 0.65 },
+        ],
+        recommendations: [
+          "Please consult with a healthcare professional for an accurate diagnosis",
+          "Consider visiting an urgent care facility if symptoms are severe",
+          "Keep track of your symptoms and when they occur",
+        ],
+      })
     }
-
-    // Sort by probability
-    const sortedResults = results.sort((a, b) => b.probability - a.probability)
-
-    // Generate recommendations based on top condition
-    const recommendations = generateRecommendations(
-      sortedResults.length > 0 ? sortedResults[0].name : "Unknown",
-      age,
-      gender,
-    )
-
-    return NextResponse.json({
-      conditions: sortedResults.slice(0, 3),
-      recommendations,
-    })
   } catch (error) {
-    console.error("Error analyzing symptoms:", error)
+    console.error("Error in API route:", error) // Modify this line
+
     return NextResponse.json({ error: "Failed to analyze symptoms" }, { status: 500 })
   }
 }
 
-function generateRecommendations(condition: string, age: number, gender: string): string[] {
+function generateRecommendations(condition: string): string[] {
   // General recommendations for any condition
   const generalRecommendations = [
     "Consult with a healthcare professional for proper diagnosis",
@@ -132,4 +104,3 @@ function generateRecommendations(condition: string, age: number, gender: string)
   // Combine recommendations
   return specificRecs.length > 0 ? [...specificRecs, generalRecommendations[0]] : generalRecommendations
 }
-
