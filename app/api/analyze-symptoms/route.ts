@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { HfInference } from "@huggingface/inference"
 
 // Initialize the Hugging Face client
-const hf = new HfInference('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')
+const hf = new HfInference(process.env.HUGGINGFACE_API_KEY)
 
 export async function POST(request: Request) {
   console.log("API route hit") // Add this line
@@ -39,8 +39,6 @@ export async function POST(request: Request) {
         recommendations,
       })
     } catch (error) {
-      console.log("Calling API...");
-
       console.error("Error with Hugging Face API:", error)
       // Fallback to mock data if the API call fails
       return NextResponse.json({
