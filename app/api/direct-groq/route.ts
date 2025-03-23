@@ -1,31 +1,6 @@
 import { NextResponse } from "next/server"
 
-// Define the system prompt for the medical assistant
-const MEDICAL_SYSTEM_PROMPT = `
-You are a medical symptom analysis assistant. Your job is to:
-1. Analyze patient symptoms and information
-2. Identify possible conditions based on the symptoms
-3. Provide a probability assessment for each condition
-4. Suggest appropriate recommendations
-5. Determine the appropriate level of care needed
-
-Always format your response as a JSON object with the following structure:
-{
-  "nextQuestion": string | null, // The next question to ask the patient, or null if diagnosis is complete
-  "conditions": [{ "name": string, "probability": number }], // Array of possible conditions with probabilities (0-1)
-  "recommendations": string[], // Array of recommendations
-  "careLevel": "self-care" | "primary care" | "specialist" | "urgent care" | "emergency", // Recommended level of care
-  "reasoning": string // Brief explanation of your reasoning
-}
-
-IMPORTANT: Your response MUST be a valid JSON object with the exact structure specified above.
-Do not include any text before or after the JSON object.
-
-Be medically accurate but cautious. When in doubt, recommend seeking professional medical advice.
-Do not diagnose rare or extremely serious conditions without strong evidence.
-Always consider common conditions first, following medical best practices.
-`
-
+// Alternative implementation using direct Groq API if you prefer not to use the AI SDK
 export async function POST(request: Request) {
   try {
     const data = await request.json()
@@ -34,7 +9,33 @@ export async function POST(request: Request) {
     // Format the conversation history and patient info for the AI
     const prompt = formatPromptFromConversation(conversation, patientInfo)
 
-    console.log("Calling Groq API with prompt:", prompt.substring(0, 200) + "...")
+    // Define the system prompt for the medical assistant
+    const MEDICAL_SYSTEM_PROMPT = `
+    You are a medical symptom analysis assistant. Your job is to:
+    1. Analyze patient symptoms and information
+    2. Identify possible conditions based on the symptoms
+    3. Provide a probability assessment for each condition
+    4. Suggest appropriate recommendations
+    5. Determine the appropriate level of care needed
+
+    Always format your response as a JSON object with the following structure:
+    {
+      "nextQuestion": string | null, // The next question to ask the patient, or null if diagnosis is complete
+      "conditions": [{ "name": string, "probability": number }], // Array of possible conditions with probabilities (0-1)
+      "recommendations": string[], // Array of recommendations
+      "careLevel": "self-care" | "primary care" | "specialist" | "urgent care" | "emergency", // Recommended level of care
+      "reasoning": string // Brief explanation of your reasoning
+    }
+
+    IMPORTANT: Your response MUST be a valid JSON object with the exact structure specified above.
+    Do not include any text before or after the JSON object.
+
+    Be medically accurate but cautious. When in doubt, recommend seeking professional medical advice.
+    Do not diagnose rare or extremely serious conditions without strong evidence.
+    Always consider common conditions first, following medical best practices.
+    `
+
+    console.log("Calling Groq API directly with prompt:", prompt.substring(0, 200) + "...")
 
     try {
       // Set up a timeout for the API call
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
       const result = await response.json()
       const aiResponse = result.choices[0].message.content
 
-      console.log("Groq API response received, length:", aiResponse.length)
+      console.log("Groq API direct response received, length:", aiResponse.length)
 
       // Parse the response as JSON
       let parsedResponse
@@ -100,8 +101,8 @@ export async function POST(request: Request) {
 
       return NextResponse.json(parsedResponse)
     } catch (error) {
-      console.error("Error calling Groq API:", error)
-      // If the Groq API call fails, fall back to the direct API implementation
+      console.error("Error calling Groq API directly:", error)
+      // If the direct API call fails, return a fallback response
       return NextResponse.json(createFallbackResponse(patientInfo))
     }
   } catch (error) {
@@ -200,6 +201,7 @@ function createFallbackResponse(patientInfo: any) {
   } else if (symptoms.includes("cough") || symptoms.includes("congestion")) {
     response = {
       nextQuestion: null,
+
       conditions: [
         { name: "Common cold", probability: 0.7 },
         { name: "Allergies", probability: 0.4 },
@@ -256,4 +258,3 @@ function createFallbackResponse(patientInfo: any) {
 
   return response
 }
-

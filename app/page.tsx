@@ -1,62 +1,30 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Activity, Stethoscope, Users, MapPin } from "lucide-react"
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b">
-        <div className="container flex h-16 items-center px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <Stethoscope className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">MediScan AI</span>
-          </Link>
-          <nav className="ml-auto flex gap-4 sm:gap-6">
-            <Link href="#features" className="text-sm font-medium hover:underline underline-offset-4">
-              Features
-            </Link>
-            <Link href="#about" className="text-sm font-medium hover:underline underline-offset-4">
-              About
-            </Link>
-            <Link href="/dashboard" className="text-sm font-medium hover:underline underline-offset-4">
-              Dashboard
-            </Link>
-          </nav>
-          <div className="ml-4">
-            <Link href="/login">
-              <Button variant="outline" className="mr-2">
-                Login
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button>Sign Up</Button>
-            </Link>
-          </div>
-        </div>
-      </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/40">
-          <div className="container px-4 md:px-6">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-blue-50">
+          <div className="container px-4 md:px-6 mx-auto">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
               <div className="space-y-4">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                   AI-Powered Healthcare Analysis & Recommendations
                 </h1>
-                <p className="text-muted-foreground md:text-xl">
+                <p className="text-gray-600 md:text-xl">
                   Analyze symptoms, monitor patient records, and get matched with the right specialists using our
                   advanced AI technology.
                 </p>
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <Link href="/symptom-checker">
-                    <Button size="lg" className="w-full sm:w-auto">
+                    <button className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                       Check Symptoms Now
-                    </Button>
+                    </button>
                   </Link>
-                  <Link href="/register">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                      Create Account
-                    </Button>
+                  <Link href="/find-specialist">
+                    <button className="w-full sm:w-auto px-6 py-3 bg-white border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                      Find Specialists Near You
+                    </button>
                   </Link>
                 </div>
               </div>
@@ -71,136 +39,114 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="features" className="w-full py-12 md:py-24">
-          <div className="container px-4 md:px-6">
+        <section className="w-full py-12 md:py-24">
+          <div className="container px-4 md:px-6 mx-auto">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Key Features</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                <p className="max-w-[900px] text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                   Our platform combines AI technology with healthcare expertise to provide you with accurate analysis
                   and personalized recommendations.
                 </p>
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3">
-              <Card>
-                <CardHeader>
-                  <Activity className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>AI-Powered Symptom Analysis</CardTitle>
-                  <CardDescription>Advanced symptom prediction using Hugging Face models</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Our AI analyzes your symptoms and medical history to provide accurate predictions and potential
-                    conditions to discuss with healthcare providers.
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Link href="/symptom-checker">
-                    <Button variant="outline" className="w-full">
-                      Try Symptom Checker
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
+              <div className="rounded-lg border bg-white p-6 shadow-sm">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                </div>
+                <h3 className="mb-2 text-xl font-bold">AI-Powered Symptom Analysis</h3>
+                <p className="mb-4 text-gray-600">
+                  Our AI analyzes your symptoms and medical history to provide accurate predictions and potential
+                  conditions to discuss with healthcare providers.
+                </p>
+                <Link href="/symptom-checker">
+                  <button className="w-full px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50">
+                    Try Symptom Checker
+                  </button>
+                </Link>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <Users className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>Patient Record Analysis</CardTitle>
-                  <CardDescription>Comprehensive monitoring and trend detection</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Securely store and analyze your medical records over time to identify patterns, track progress, and
-                    receive personalized health insights.
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Link href="/records">
-                    <Button variant="outline" className="w-full">
-                      Manage Records
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
+              <div className="rounded-lg border bg-white p-6 shadow-sm">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="mb-2 text-xl font-bold">Patient Record Analysis</h3>
+                <p className="mb-4 text-gray-600">
+                  Securely store and analyze your medical records over time to identify patterns, track progress, and
+                  receive personalized health insights.
+                </p>
+                <Link href="/records">
+                  <button className="w-full px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50">
+                    Manage Records
+                  </button>
+                </Link>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <MapPin className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>Doctor Recommendation</CardTitle>
-                  <CardDescription>Find specialists based on your condition and location</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    Get matched with qualified specialists in your area based on your symptoms, condition, and doctor
-                    availability using our intelligent matching system.
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Link href="/find-doctor">
-                    <Button variant="outline" className="w-full">
-                      Find Specialists
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
+              <div className="rounded-lg border bg-white p-6 shadow-sm">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="mb-2 text-xl font-bold">Find Specialists Near You</h3>
+                <p className="mb-4 text-gray-600">
+                  Get matched with qualified specialists in your area based on your symptoms, condition, and location
+                  using our intelligent matching system.
+                </p>
+                <Link href="/find-specialist">
+                  <button className="w-full px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50">
+                    Find Specialists
+                  </button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
       </main>
-      <footer className="border-t">
-        <div className="container flex flex-col gap-4 py-10 md:flex-row md:gap-8 md:py-12">
-          <div className="flex flex-col gap-2 md:gap-4 md:flex-1">
-            <Link href="/" className="flex items-center gap-2">
-              <Stethoscope className="h-5 w-5 text-primary" />
-              <span className="text-lg font-bold">MediScan AI</span>
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              AI-powered healthcare analysis and recommendations.
-              <br />© {new Date().getFullYear()} MediScan AI. All rights reserved.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:flex-1">
-            <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-medium">Platform</h3>
-              <Link href="#" className="text-sm text-muted-foreground hover:underline">
-                Features
-              </Link>
-              <Link href="#" className="text-sm text-muted-foreground hover:underline">
-                Pricing
-              </Link>
-              <Link href="#" className="text-sm text-muted-foreground hover:underline">
-                FAQ
-              </Link>
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-medium">Company</h3>
-              <Link href="#" className="text-sm text-muted-foreground hover:underline">
-                About
-              </Link>
-              <Link href="#" className="text-sm text-muted-foreground hover:underline">
-                Careers
-              </Link>
-              <Link href="#" className="text-sm text-muted-foreground hover:underline">
-                Contact
-              </Link>
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-sm font-medium">Legal</h3>
-              <Link href="#" className="text-sm text-muted-foreground hover:underline">
-                Privacy
-              </Link>
-              <Link href="#" className="text-sm text-muted-foreground hover:underline">
-                Terms
-              </Link>
-              <Link href="#" className="text-sm text-muted-foreground hover:underline">
-                HIPAA
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
