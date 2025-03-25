@@ -26,7 +26,7 @@ export default function RootLayout({
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-xl font-bold">MediScan AI</span>
+                <span className="text-xl font-bold"> JeevanAI</span>
               </Link>
               <nav className="ml-auto flex gap-4 sm:gap-6">
                 <Link href="/" className="text-sm font-medium hover:underline underline-offset-4">
@@ -57,4 +57,3 @@ export default function RootLayout({
     </html>
   )
 }
-

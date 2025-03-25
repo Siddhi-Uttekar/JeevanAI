@@ -55,30 +55,52 @@ const SpecialistMap = () => {
   };
 
   const handleLocationAccess = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserLocation([latitude, longitude]);
+    // Manually set location to your college
+    const fixedLatitude = 18.531342351484124;
+    const fixedLongitude = 73.8673063285546;
 
-          if (map) {
-            map.setView([latitude, longitude], 13);  // Set the map view to user's location
-            L.marker([latitude, longitude])
-              .addTo(map)
-              .bindPopup("<b>You are here</b>")
-              .openPopup();
-          }
-        },
-        (error) => {
-          console.error("Error accessing location:", error);
-          alert("Location access denied. Please allow location access to find nearby specialists.");
-        },
-        { enableHighAccuracy: true }  // Request for more accurate location
-      );
-    } else {
-      alert("Geolocation is not supported by your browser.");
+    setUserLocation([fixedLatitude, fixedLongitude]);
+
+    if (map) {
+      map.setView([fixedLatitude, fixedLongitude], 15); // Adjust zoom level as needed
+      L.marker([fixedLatitude, fixedLongitude])
+        .addTo(map)
+        .bindPopup("<b>you are here!</b>")
+        .openPopup();
     }
   };
+
+
+  // const handleLocationAccess = () => {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+
+  //         const { latitude, longitude } = position.coords;
+  //         setUserLocation([latitude, longitude]);
+
+  //         if (map) {
+  //           map.setView([latitude, longitude], 13);  // Set the map view to user's location
+  //           L.marker([latitude, longitude])
+  //             .addTo(map)
+  //             .bindPopup("<b>You are here</b>")
+  //             .openPopup();
+  //         }
+  //       },
+  //       (error) => {
+  //         console.error("Error accessing location:", error);
+  //         alert("Location access denied. Please allow location access to find nearby specialists.");
+  //       },
+  //       {
+  //         enableHighAccuracy: true, // Forces GPS-based location
+  //         timeout: 5000, // Waits up to 5s for a location
+  //         maximumAge: 0, // Ensures fresh data, not cached location
+  //       }
+  //     );
+  //   } else {
+  //     alert("Geolocation is not supported by your browser.");
+  //   }
+  // };
 
   return (
     <div className="p-6 bg-gray-100">
