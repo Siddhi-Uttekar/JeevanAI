@@ -12,6 +12,7 @@ export async function POST(request: Request) {
     // Define the system prompt for the medical assistant
     const MEDICAL_SYSTEM_PROMPT = `
     You are a medical symptom analysis assistant. Your job is to:
+
     1. Analyze patient symptoms and information
     2. Identify possible conditions based on the symptoms
     3. Provide a probability assessment for each condition
@@ -257,4 +258,179 @@ function createFallbackResponse(patientInfo: any) {
   }
 
   return response
+}
+import { NextResponse } from "next/server"
+
+// Enhanced system prompt
+const MEDICAL_SYSTEM_PROMPT = `
+You are a medical assistant conducting structured symptom interviews. Follow EXACTLY this protocol:
+
+1. FIRST REQUEST:
+   "To begin, please provide your age and biological sex (male/female)."
+
+2. If age/sex missing:
+   "I need your age and biological sex to proceed. For example: 'I'm 30 male'."
+
+   3.Analyze patient symptoms and information
+  4.Identify possible conditions based on the symptoms
+   5.Provide a probability assessment for each condition
+    6. Suggest appropriate recommendations
+  7. Determine the appropriate level of care needed
+
+5. Only proceed to analysis after:
+   - Age and sex confirmed
+   - At least 3 symptom details per symptom
+
+Response MUST be JSON with this structure:
+{
+  "stage": "collecting_info" | "analysis",
+  "missingInfo": string[],
+  "nextQuestion": string,
+  "collectedData": {
+    "age": number | null,
+    "gender": string | null,
+    "symptoms": {
+      "name": string,
+      "duration": string | null,
+      "severity": number | null,
+      "description": string | null,
+      "triggers": string | null
+    }[]
+  },
+  "analysis": null | {
+    "conditions": { "name": string, "probability": number }[],
+    "recommendations": string[],
+    "careLevel": "self-care" | "primary" | "urgent" | "emergency"
+  }
+}
+`
+
+export async function POST(request: Request) {
+  try {
+    const { conversation, patientInfo = {} } = await request.json()
+
+    // Parse conversation to extract data
+    const { age, gender, symptoms } = parseConversation(conversation)
+
+    // Prepare prompt
+    const prompt = `
+Patient Information:
+- Age: ${age || 'Not provided'}
+- Sex: ${gender || 'Not provided'}
+- Symptoms: ${symptoms.length > 0 ? symptoms.map(s => s.name).join(', ') : 'None'}
+
+Conversation History:
+${conversation.map(m => `${m.role === 'assistant' ? 'Doctor' : 'Patient'}: ${m.content}`).join('\n')}
+
+Please continue the medical interview according to the protocol.`
+
+    // Call Groq API
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 15000)
+
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          { role: "system", content: MEDICAL_SYSTEM_PROMPT },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.2,
+        response_format: { type: "json_object" }
+      }),
+      signal: controller.signal
+    })
+
+    clearTimeout(timeout)
+
+    if (!response.ok) throw new Error(`API error: ${response.status}`)
+
+    const result = await response.json()
+    const content = JSON.parse(result.choices[0].message.content)
+
+    return NextResponse.json(content)
+
+  } catch (error) {
+    console.error("Error:", error)
+    return NextResponse.json({
+      stage: "collecting_info",
+      missingInfo: ["age", "gender"],
+      nextQuestion: "To begin, please provide your age and biological sex (male/female).",
+      collectedData: { age: null, gender: null, symptoms: [] },
+      analysis: null
+    }, { status: 500 })
+  }
+}
+
+// Enhanced conversation parser
+function parseConversation(conversation: any[]) {
+  let age: number | null = null
+  let gender: string | null = null
+  const symptoms: any[] = []
+  let currentSymptom: any = null
+
+  for (const msg of conversation) {
+    if (msg.role === 'user') {
+      // Extract age
+      if (!age) {
+        const ageMatch = msg.content.match(/(\d+)\s*(year|yo|y\.o)/i)
+        if (ageMatch) age = parseInt(ageMatch[1])
+      }
+
+      // Extract gender
+      if (!gender) {
+        if (msg.content.match(/male|man|boy|m\b/i)) gender = "male"
+        if (msg.content.match(/female|woman|girl|f\b/i)) gender = "female"
+      }
+
+      // Symptom handling
+      if (msg.content.match(/symptom|pain|ache|feel|experience/i)) {
+        if (!currentSymptom) {
+          currentSymptom = {
+            name: extractSymptomName(msg.content),
+            duration: null,
+            severity: null,
+            description: null,
+            triggers: null
+          }
+          symptoms.push(currentSymptom)
+        } else {
+          // Check for answers to symptom questions
+          if (msg.content.match(/day|week|month|year|hour/i)) {
+            currentSymptom.duration = msg.content
+          } else if (msg.content.match(/\d+\s*out of 10|\b\d+\b/i)) {
+            const severityMatch = msg.content.match(/\b\d+\b/)
+            if (severityMatch) currentSymptom.severity = parseInt(severityMatch[0])
+          } else if (msg.content.match(/describe|feels like|nature/i)) {
+            currentSymptom.description = msg.content
+          } else if (msg.content.match(/better|worse|trigger|alleviate/i)) {
+            currentSymptom.triggers = msg.content
+          }
+        }
+      }
+    }
+  }
+
+  return { age, gender, symptoms }
+}
+
+function extractSymptomName(text: string): string {
+  const symptomKeywords = [
+    'headache', 'pain', 'fever', 'cough', 'nausea',
+    'dizziness', 'fatigue', 'rash', 'swelling'
+  ]
+
+  for (const keyword of symptomKeywords) {
+    if (text.toLowerCase().includes(keyword)) {
+      return keyword
+    }
+  }
+
+  // Fallback to first few words
+  return text.split(' ').slice(0, 3).join(' ').replace(/[.,]/, '')
 }
