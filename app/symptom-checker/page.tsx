@@ -1127,13 +1127,13 @@ export default function SymptomChecker() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sex</label>
                   <select
                     value={patientInfo.gender}
                     onChange={(e) => setPatientInfo({...patientInfo, gender: e.target.value})}
                     className="w-full p-2 border rounded-md"
                   >
-                    <option value="">Select gender</option>
+                    <option value=""> select you sex</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>

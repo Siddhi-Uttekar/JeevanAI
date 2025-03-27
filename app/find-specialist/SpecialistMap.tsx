@@ -112,7 +112,7 @@ const SpecialistMap = () => {
             type="text"
             value={illness}
             onChange={(e) => setIllness(e.target.value)}
-            placeholder="Enter your symptoms or illness (e.g., Diabetes, Cancer)"
+            placeholder="search for suggested specialists near you"
             className="border p-2 rounded w-full mb-2"
           />
           <button
