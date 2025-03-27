@@ -1385,7 +1385,7 @@ export default function SymptomChecker() {
                     <button
                       className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                       onClick={() => {
-                        console.log('Find doctors clicked');
+                        window.location.href = `http://localhost:3000/find-specialist?specialty=${encodeURIComponent(getDoctorRecommendation(diagnosisResult.conditions, diagnosisResult.careLevel).specialty)}`;
                       }}
                     >
                       Find {getDoctorRecommendation(diagnosisResult.conditions, diagnosisResult.careLevel).specialty} Near Me

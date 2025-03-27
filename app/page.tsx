@@ -30,9 +30,9 @@ export default function Home() {
               </div>
               <div className="relative aspect-video overflow-hidden rounded-xl">
                 <img
-                  src="/home2.webp?height=420&width=880"
+                  src="/output (1).jpg?height=420&width=1080"
                   alt="Medical dashboard interface"
-                  className="object-scale-down w-dvw h-full"
+                  className="object-contain w-dvw h-full"
                 />
               </div>
             </div>
@@ -170,7 +170,7 @@ export default function Home() {
 
       {/* Card 6 */}
       <div className="flex-shrink-0 w-96 bg-cyan-600 rounded-lg p-6 shadow-md">
-        <h3 className="text-xl font-bold text-white mb-3">6. Receive recommendations and whic doctor to look for</h3>
+        <h3 className="text-xl font-bold text-white mb-3">6. Receive recommendations and which doctor to look for</h3>
         <img
           src="/w6.png"
           alt="Find specialists"
