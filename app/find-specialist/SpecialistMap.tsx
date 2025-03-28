@@ -105,21 +105,20 @@ const SpecialistMap = () => {
   return (
     <div className="p-6 bg-gray-100">
       <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-4">Find a Specialist Near You</h1>
+        <h1 className="text-2xl font-bold mb-4">Find Specialist/ Healthcare centers Near You</h1>
 
         <div className="mb-4">
           <input
             type="text"
             value={illness}
             onChange={(e) => setIllness(e.target.value)}
-            placeholder="search for suggested specialists near you"
+            placeholder="search for places/ specialists"
             className="border p-2 rounded w-full mb-2"
           />
           <button
             onClick={fetchSpecialists}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Find Specialists
+          >Search
           </button>
           <button
             onClick={handleLocationAccess}

@@ -45,8 +45,8 @@ export default function Home() {
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">About JeevanAI</h2>
                 <p className="max-w-[900px] text-black-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Meet JeenAI – Your AI-Powered Medical Assistant
-                   JeenAI combines advanced AI with medical expertise to provide
+                Meet JeevanAI – Your AI-Powered Medical Assistant
+                   JeevanAI combines advanced AI with medical expertise to provide
                      personalized symptom analysis and actionable next steps.
                 </p>
               </div>
@@ -192,13 +192,13 @@ export default function Home() {
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <details className="group" open>
           <summary className="flex justify-between items-center p-6 cursor-pointer list-none">
-            <h3 className="text-lg font-medium text-gray-900">How accurate is JeenAI's symptom analysis?</h3>
+            <h3 className="text-lg font-medium text-gray-900">How accurate is JeevanAI's symptom analysis?</h3>
             <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
           <div className="px-6 pb-6 pt-0 text-gray-600">
-            <p>JeenAI leverages cutting-edge AI models (Groq + Deepseek) trained on medical literature and anonymized case data. While our system shows promising diagnostic alignment with clinical guidelines, AI symptom checkers typically achieve 70-85% accuracy compared to physicians for common conditions.</p>
+            <p>JeevanAI leverages cutting-edge AI models (Groq + Deepseek) trained on medical literature and anonymized case data. While our system shows promising diagnostic alignment with clinical guidelines, AI symptom checkers typically achieve 70-85% accuracy compared to physicians for common conditions.</p>
           </div>
         </details>
       </div>
@@ -294,7 +294,7 @@ export default function Home() {
 
       <div className="space-y-4 text-gray-600">
         <p>
-          <strong>JeenAI is an informational tool only</strong> - it does not provide medical diagnosis,
+          <strong>JeevanAI is an informational tool only</strong> - it does not provide medical diagnosis,
           treatment, or emergency services. Our AI analysis is based on pattern recognition
           and cannot replace professional medical evaluation.
         </p>
