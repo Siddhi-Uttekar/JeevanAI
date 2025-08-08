@@ -1,4 +1,4 @@
-"use client"; // Mark this component as a Client Component
+"use client"; 
 
 import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
@@ -69,38 +69,6 @@ const SpecialistMap = () => {
         .openPopup();
     }
   };
-
-
-  // const handleLocationAccess = () => {
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => {
-
-  //         const { latitude, longitude } = position.coords;
-  //         setUserLocation([latitude, longitude]);
-
-  //         if (map) {
-  //           map.setView([latitude, longitude], 13);  // Set the map view to user's location
-  //           L.marker([latitude, longitude])
-  //             .addTo(map)
-  //             .bindPopup("<b>You are here</b>")
-  //             .openPopup();
-  //         }
-  //       },
-  //       (error) => {
-  //         console.error("Error accessing location:", error);
-  //         alert("Location access denied. Please allow location access to find nearby specialists.");
-  //       },
-  //       {
-  //         enableHighAccuracy: true, // Forces GPS-based location
-  //         timeout: 5000, // Waits up to 5s for a location
-  //         maximumAge: 0, // Ensures fresh data, not cached location
-  //       }
-  //     );
-  //   } else {
-  //     alert("Geolocation is not supported by your browser.");
-  //   }
-  // };
 
   return (
     <div className="p-6 bg-gray-100">
