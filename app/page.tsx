@@ -106,7 +106,7 @@ export default function Home() {
         <section className="w-full py-12">
   <div className="container px-4 mx-auto">
     <div className="text-center mb-12">
-      <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">About JeevanAI</h2>
+      <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">How to use this application</h2>
       <p className="max-w-2xl mx-auto text-lg">
         Meet JeenAI – Your AI-Powered Medical Assistant that provides personalized symptom analysis.
       </p>
@@ -198,7 +198,10 @@ export default function Home() {
             </svg>
           </summary>
           <div className="px-6 pb-6 pt-0 text-gray-600">
-            <p>JeevanAI leverages cutting-edge AI models (Groq + Deepseek) trained on medical literature and anonymized case data. While our system shows promising diagnostic alignment with clinical guidelines, AI symptom checkers typically achieve 70-85% accuracy compared to physicians for common conditions.</p>
+            <p>JeevanAI uses advanced AI models like Meta’s LLaMA 3.1 via Groq and optionally DeepSeek, which are informed by general
+              medical literature but not clinically fine-tuned. While it offers helpful symptom insights, its accuracy is estimated
+              around 65–75% for common conditions, depending on input quality. It is meant to assist, not replace, professional medical
+              diagnosis.</p>
           </div>
         </details>
       </div>

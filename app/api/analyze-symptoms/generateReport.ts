@@ -1,5 +1,4 @@
-
-  import { jsPDF } from "jspdf";
+import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { MedicalReport, MedicalSpecialty } from "./type";
 
@@ -91,7 +90,7 @@ export const generateMedicalReport = (data: MedicalReport) => {
       ? data.assessment.conditions.map(c => [
           c.name,
           `${Math.round(c.probability * 100)}%`,
-          data.assessment.reasoning.substring(0, 100) + (data.assessment.reasoning.length > 100 ? "..." : "")
+          c.reason || "No additional notes"
         ])
       : [["No conditions identified", "", ""]],
     theme: "grid",
@@ -121,71 +120,54 @@ export const generateMedicalReport = (data: MedicalReport) => {
     }
   });
 
-  // Add this after the Recommendations section in generateReport.ts
-// In generateReport.ts - after Recommendations section
-if (data.doctorRecommendation) {
-  const startY = getLastTablePosition(doc) + 15;
-  doc.setFontSize(14);
-  doc.text("Recommended Specialist", 14, startY);
+  // Recommended Specialist section
+  if (data.doctorRecommendation) {
+    const startY = getLastTablePosition(doc) + 15;
+    doc.setFontSize(14);
+    doc.text("Recommended Specialist", 14, startY);
 
-  // Urgency colors
-  const urgency = {
-    emergency: [255, 0, 0],    // red
-    urgent: [255, 165, 0],     // orange
-    routine: [0, 128, 0]       // green
-  }[data.doctorRecommendation.urgency] || [0, 0, 0];
+    // Urgency colors
+    const urgency = {
+      emergency: [255, 0, 0],    // red
+      urgent: [255, 165, 0],     // orange
+      routine: [0, 128, 0]       // green
+    }[data.doctorRecommendation.urgency] || [0, 0, 0];
 
-  // Complete icon mapping
-
-
-  autoTable(doc, {
-    startY: startY + 10,
-    body: [
-      [
-        {
-          content: data.doctorRecommendation.specialty,
-          styles: { fontSize: 13, cellPadding: { top: 5, bottom: 5, left: 5 }, textColor: [0, 0, 255] }
-        },
-        {
-          content: [
-            `\n${data.doctorRecommendation.reason}\nPriority.urgency : ${data.doctorRecommendation.urgency.toUpperCase()}`
-          ],
-          styles: {
-            cellPadding: { left: 10 },
-            textColor:
-              data.doctorRecommendation.urgency.toUpperCase() === "EMERGENCY"
-                ? [255, 0, 0] // Red for emergency
-                : data.doctorRecommendation.urgency.toUpperCase() === "URGENT"
-                ? [255, 165, 0] // Orange for urgent
-                : [0, 128, 0] // Green for routine
+    autoTable(doc, {
+      startY: startY + 10,
+      body: [
+        [
+          {
+            content: data.doctorRecommendation.specialty,
+            styles: { fontSize: 13, cellPadding: { top: 5, bottom: 5, left: 5 }, textColor: [0, 0, 255] }
+          },
+          {
+            content: [
+              `\n${data.doctorRecommendation.reason}\nPriority urgency: ${data.doctorRecommendation.urgency.toUpperCase()}`
+            ],
+            styles: {
+              cellPadding: { left: 10 },
+              textColor:
+                data.doctorRecommendation.urgency.toUpperCase() === "EMERGENCY"
+                  ? [255, 0, 0]
+                  : data.doctorRecommendation.urgency.toUpperCase() === "URGENT"
+                  ? [255, 165, 0]
+                  : [0, 128, 0]
+            }
           }
-        }
-      ]
-    ],
-    theme: "grid",
-    styles: {
-      fontSize: 11,
-      cellPadding: 6
-    },
-    columnStyles: {
-      0: { cellWidth: 'auto' },
-      1: { cellWidth: 'auto' }
-    }
-  });
-}
-  // Footer
-  doc.setFontSize(9);
-  doc.setTextColor(100);
-  doc.text(
-    "Disclaimer: This report is for informational purposes only and does not constitute medical advice.",
-    14,
-    doc.internal.pageSize.height - 15,
-    { maxWidth: 180 }
-  );
-
-  // Save PDF
-doc.save(`Medical_Report_${data.patientInfo.gender || 'Patient'}_${new Date().toISOString().slice(0,10)}.pdf`);
-
+        ]
+      ],
+      theme: "grid",
+      styles: {
+        fontSize: 11,
+        cellPadding: 6
+      },
+      columnStyles: {
+        0: { cellWidth: 'auto' },
+        1: { cellWidth: 'auto' }
+      }
+    });
+  }
 
   // Footer
   doc.setFontSize(9);
