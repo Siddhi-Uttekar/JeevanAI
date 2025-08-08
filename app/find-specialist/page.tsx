@@ -13,15 +13,4 @@ export default function FindSpecialistPage() {
     </div>
   );
 }
-// import FindSpecialist from "./FindSpecialist";
 
-// export default function FindSpecialistPage() {
-//   return (
-//     <div className="container mx-auto p-4">
-//       <FindSpecialist
-//         location={{ lat: 0, lon: 0 }}
-//         places={[]}
-//       />
-//     </div>
-//   );
-//}
