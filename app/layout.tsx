@@ -35,7 +35,7 @@ export default function RootLayout({
           <footer className="border-t bg-white">
             <div className="container mx-auto px-4 py-6">
               <p className="text-center text-sm text-gray-500">
-                © {new Date().getFullYear()} MediScan AI. This is not a substitute for professional medical advice.
+                © {new Date().getFullYear()} jeevanAI. This is not a substitute for professional medical advice.
               </p>
             </div>
           </footer>
