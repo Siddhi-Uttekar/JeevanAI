@@ -1,78 +1,21 @@
 
 "use client"
-import { useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent, useMemo } from "react";
 import { generateMedicalReport } from "../api/analyze-symptoms/generateReport";
-
-type Message = {
-  role: "assistant" | "user";
-  content: string;
-};
-
-type PatientInfo = {
-  age: string;
-  gender: string;
-  location?: string;
-  [key: string]: any;
-};
-
-type MedicalHistory = {
-  conditions: string[];
-  medications: string[];
-  allergies: string[];
-  smoker: boolean;
-  alcoholUse: string;
-  familyHistory: string[];
-};
-
-type SymptomDetails = {
-  name: string;
-  duration: string;
-  severity: number;
-  description: string;
-};
-
-type MedicalSpecialty =
-  | 'Primary Care Physician'
-  | 'Cardiologist'
-  | 'Neurologist'
-  | 'Pulmonologist'
-  | 'Endocrinologist'
-  | 'Gastroenterologist'
-  | 'Dermatologist'
-  | 'Emergency Room';
-
-type DoctorRecommendation = {
-  specialty: MedicalSpecialty;
-  reason: string;
-  urgency: 'routine' | 'urgent' | 'emergency';
-};
-
-type DiagnosisResult = {
-  conditions: Array<{ name: string; probability: number }>;
-  recommendations: string[];
-  careLevel: "self-care" | "primary care" | "specialist" | "urgent care" | "emergency";
-  reasoning: string;
-  nextQuestion: string | null;
-};
-
-
-type MedicalReport = {
-  patientInfo: {
-    age: number;
-    gender: string;
-    location?: string;
-  };
-  medicalHistory: MedicalHistory;
-  symptoms: SymptomDetails[];
-  assessment: {
-    conditions: Array<{ name: string; probability: number }>;
-    recommendations: string[];
-    careLevel: string;
-    reasoning: string;
-  };
-  doctorRecommendation?: DoctorRecommendation; // Add this line
-  generatedAt: string;
-};
+import { DoctorRecommendationCard } from "./components/DoctorRecommendationCard";
+import {
+  extractSymptoms,
+  getDoctorRecommendation,
+} from "./utils/symptomUtils";
+import {
+  Message,
+  PatientInfo,
+  MedicalHistory,
+  SymptomDetails,
+  DiagnosisResult,
+  MedicalReport,
+  DoctorRecommendation
+} from "@/app/api/analyze-symptoms/type";
 
 export default function SymptomChecker() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -157,7 +100,7 @@ export default function SymptomChecker() {
           ...analysis,
           nextQuestion: result.nextQuestion
         });
-        setMessages([...newMessages, { role: "assistant", content: result.nextQuestion }]);
+        setMessages([...newMessages, { role: "assistant", content: result.nextQuestion ?? "Sorry, I am unable to provide a response at this time." }]);
       }
     } catch (err) {
       console.error("Error:", err);
@@ -192,170 +135,36 @@ export default function SymptomChecker() {
       }
     ]);
   };
-  const extractSymptoms = (): SymptomDetails[] => {
-    const symptoms: SymptomDetails[] = [];
-    const symptomPattern = /\b(pain|ache|discomfort|nausea|dizziness|fever|cough|shortness of breath|headache|fatigue|rash|swelling|bleeding)\b/i;
-    let currentSymptom: SymptomDetails | null = null;
 
-    for (let i = 0; i < messages.length; i++) {
-      const msg = messages[i];
-      if (!msg.content?.trim()) continue;
-
-      if (msg.role === 'user') {
-        // Check if this is a response to a duration question
-        if (currentSymptom && !currentSymptom.duration &&
-            i > 0 && messages[i-1].content.includes('How long')) {
-          currentSymptom.duration = msg.content;
-          continue;
-        }
-
-        // Check if this is a response to a severity question
-        if (currentSymptom && currentSymptom.severity === undefined &&
-            i > 0 && messages[i-1].content.includes('scale of 1-10')) {
-          const severityMatch = msg.content.match(/\b([1-9]|10)\b/);
-          currentSymptom.severity = severityMatch ? parseInt(severityMatch[1]) : 5;
-          continue;
-        }
-
-        // Detect new symptoms
-        const symptomMatch = msg.content.match(symptomPattern);
-        if (symptomMatch) {
-          // Finalize previous symptom if exists
-          if (currentSymptom) {
-            symptoms.push(currentSymptom);
-          }
-
-          currentSymptom = {
-            name: symptomMatch[0],
-            duration: 'Unknown',
-            severity: 5, // Default value
-            description: msg.content.length > 100
-              ? `${msg.content.substring(0, 100)}...`
-              : msg.content
-          };
-        }
-      }
-    }
-
-    // Add the last symptom if it exists
-    if (currentSymptom) {
-      symptoms.push(currentSymptom);
-    }
-
-    return symptoms;
-  };
-  const getDoctorRecommendation = (
-    conditions: {name: string, probability: number}[],
-    careLevel: DiagnosisResult['careLevel']
-  ): DoctorRecommendation => {
-    const lowerConditions = conditions.map(c => c.name.toLowerCase());
-
-    // Emergency override
-    if (careLevel === 'emergency') {
-      return {
-        specialty: 'Emergency Room',
-        reason: 'Immediate medical attention required',
-        urgency: 'emergency'
-      };
-    }
-
-    // Cardiac conditions
-    const cardiacKeywords = ['heart', 'chest pain', 'angina', 'arrhythmia'];
-    if (cardiacKeywords.some(keyword =>
-      lowerConditions.some(c => c.includes(keyword)))
-    ) {
-      return {
-        specialty: 'Cardiologist',
-        reason: 'Cardiac evaluation recommended',
-        urgency: careLevel === 'urgent care' ? 'urgent' : 'routine'
-      };
-    }
-
-    // Neurological conditions
-    const neuroKeywords = ['migraine', 'seizure', 'stroke', 'neuropathy'];
-    if (neuroKeywords.some(keyword =>
-      lowerConditions.some(c => c.includes(keyword)))
-    ) {
-      return {
-        specialty: 'Neurologist',
-        reason: 'Neurological evaluation suggested',
-        urgency: lowerConditions.some(c => c.includes('stroke')) ? 'urgent' : 'routine'
-      };
-    }
-
-    // Respiratory conditions
-    const respiratoryKeywords = ['asthma', 'copd', 'pneumonia', 'shortness of breath'];
-    if (respiratoryKeywords.some(keyword =>
-      lowerConditions.some(c => c.includes(keyword)))
-    ) {
-      return {
-        specialty: 'Pulmonologist',
-        reason: 'Respiratory evaluation recommended',
-        urgency: lowerConditions.some(c => c.includes('pneumonia')) ? 'urgent' : 'routine'
-      };
-    }
-
-    // Endocrine conditions
-    if (lowerConditions.some(c => c.includes('diabetes') || c.includes('thyroid'))) {
-      return {
-        specialty: 'Endocrinologist',
-        reason: 'Metabolic/hormonal evaluation needed',
-        urgency: 'routine'
-      };
-    }
-
-    // Default to primary care
-    return {
-      specialty: 'Primary Care Physician',
-      reason: 'Initial evaluation and referral if needed',
-      urgency: 'routine'
-    };
-  };
-
-  const DoctorRecommendationCard = ({
-    recommendation
-  }: {
-    recommendation: DoctorRecommendation
-  }) => {
-    const urgencyClasses = {
-      emergency: 'bg-red-100 text-red-800 border-red-200',
-      urgent: 'bg-orange-100 text-orange-800 border-orange-200',
-      routine: 'bg-green-100 text-green-800 border-green-200'
-    };
-
-    const specialtyIcons = {
-      'Cardiologist': '❤️',
-      'Neurologist': '🧠',
-      'Pulmonologist': '🫁',
-      'Endocrinologist': '🦋',
-      'Primary Care Physician': '👨‍⚕️',
-      'Emergency Room': '🚨',
-      'default': '🏥'
-    };
-
-    return (
-      <div className={`border rounded-lg p-4 ${urgencyClasses[recommendation.urgency]} mt-4`}>
-        <div className="flex items-start gap-3">
-          <span className="text-2xl" role="img">
-            {specialtyIcons[recommendation.specialty as keyof typeof specialtyIcons] || specialtyIcons.default}
-          </span>
-          <div>
-            <h3 className="font-bold text-lg mb-1">
-              {recommendation.specialty}
-            </h3>
-            <p className="mb-2">{recommendation.reason}</p>
-            <div className="flex items-center">
-              <span className="font-medium mr-2">Priority:</span>
-              <span className={`px-2 py-1 rounded-md text-xs font-semibold ${
-                urgencyClasses[recommendation.urgency]
-              }`}>
-                {recommendation.urgency.toUpperCase()}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+  const doctorRecommendation = useMemo(() => {
+    if (!diagnosisComplete) return null;
+    return getDoctorRecommendation(
+      diagnosisResult.conditions,
+      diagnosisResult.careLevel
     );
+  }, [diagnosisComplete, diagnosisResult.conditions, diagnosisResult.careLevel]);
+
+
+  const resetState = () => {
+    setMessages([]);
+    setDiagnosisComplete(false);
+    setDiagnosisResult({
+      conditions: [],
+      recommendations: [],
+      careLevel: "self-care",
+      reasoning: "",
+      nextQuestion: null,
+    });
+    setPatientInfo({ age: "", gender: "" });
+    setMedicalHistory({
+      conditions: [],
+      medications: [],
+      allergies: [],
+      smoker: false,
+      alcoholUse: "none",
+      familyHistory: [],
+    });
+    setStep("demographics");
   };
 
   const handleGenerateReport = () => {
@@ -368,18 +177,15 @@ export default function SymptomChecker() {
         location: patientInfo.location || 'Not specified'
       },
       medicalHistory,
-      symptoms: extractSymptoms(),
+      symptoms: extractSymptoms(messages),
       assessment: {
         conditions: diagnosisResult.conditions,
         recommendations: diagnosisResult.recommendations,
         careLevel: diagnosisResult.careLevel,
-        reasoning: diagnosisResult.reasoning
+        reasoning: diagnosisResult.reasoning,
       },
-      doctorRecommendation: getDoctorRecommendation( // Add this
-        diagnosisResult.conditions,
-        diagnosisResult.careLevel
-      ),
-      generatedAt: new Date().toISOString()
+      doctorRecommendation: doctorRecommendation || undefined,
+      generatedAt: new Date().toISOString(),
     };
 
     try {
@@ -427,17 +233,7 @@ export default function SymptomChecker() {
                 Answer questions to get a medical assessment and report.
               </p>
             </div>
-            {/* <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">API Mode:</span>
-              <button
-                onClick={() => setUseDirectAPI(!useDirectAPI)}
-                className={`px-3 py-1 text-sm rounded-md border ${
-                  useDirectAPI ? "bg-blue-600 text-white" : "bg-white text-gray-700"
-                }`}
-              >
-                {useDirectAPI ? "Direct API" : "AI SDK"}
-              </button>
-            </div> */}
+            
           </div>
         </div>
 
@@ -464,16 +260,16 @@ export default function SymptomChecker() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Sex</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
                   <select
                     value={patientInfo.gender}
                     onChange={(e) => setPatientInfo({...patientInfo, gender: e.target.value})}
                     className="w-full p-2 border rounded-md"
                   >
-                    <option value=""> select you sex</option>
+                    <option value=""> select your gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
-                    <option value="female">prefer not to say</option>
+                    <option value="other">prefer not to say</option>
                   </select>
                 </div>
                 <div className="md:col-span-2">
@@ -711,47 +507,16 @@ export default function SymptomChecker() {
                   </div>
 
                   {/* Doctor Recommendation Section */}
-                  <div>
-                    <h3 className="text-lg font-semibold mb-3">Recommended Specialist</h3>
-                    <DoctorRecommendationCard
-                      recommendation={getDoctorRecommendation(
-                        diagnosisResult.conditions,
-                        diagnosisResult.careLevel
-                      )}
-                    />
-                    <button
-                      className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                      onClick={() => {
-                        window.location.href = `http://localhost:3000/find-specialist?specialty=${encodeURIComponent(getDoctorRecommendation(diagnosisResult.conditions, diagnosisResult.careLevel).specialty)}`;
-                      }}
-                    >
-                      Find {getDoctorRecommendation(diagnosisResult.conditions, diagnosisResult.careLevel).specialty} Near Me
-                    </button>
-                  </div>
+                  {doctorRecommendation && (
+                    <div>
+                      <h3 className="text-lg font-semibold mb-3">Recommended Specialist</h3>
+                      <DoctorRecommendationCard recommendation={doctorRecommendation} />
+                    </div>
+                  )}
 
                   <div className="flex justify-between">
                     <button
-                      onClick={() => {
-                        setMessages([]);
-                        setDiagnosisComplete(false);
-                        setDiagnosisResult({
-                          conditions: [],
-                          recommendations: [],
-                          careLevel: "self-care",
-                          reasoning: "",
-                          nextQuestion: null
-                        });
-                        setPatientInfo({ age: "", gender: "" });
-                        setMedicalHistory({
-                          conditions: [],
-                          medications: [],
-                          allergies: [],
-                          smoker: false,
-                          alcoholUse: 'none',
-                          familyHistory: []
-                        });
-                        setStep("demographics");
-                      }}
+                      onClick={resetState}
                       className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                     >
                       Start New Assessment

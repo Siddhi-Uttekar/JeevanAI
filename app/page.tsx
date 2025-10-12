@@ -21,11 +21,6 @@ export default function Home() {
                       Check Symptoms Now
                     </button>
                   </Link>
-                  <Link href="/find-specialist">
-                    <button className="w-full sm:w-auto px-6 py-3 bg-white border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                      Find Specialists Near You
-                    </button>
-                  </Link>
                 </div>
               </div>
               <div className="relative aspect-video overflow-hidden rounded-xl">
@@ -51,7 +46,7 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3 h-fit">
+            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-2 h-fit">
 
               <div className="rounded-lg border bg-cyan-600 p-6 shadow-sm">
                 <h3 className="mb-2 text-xl text-white font-bold">AI-Powered Symptom Analysis</h3>
@@ -83,20 +78,6 @@ export default function Home() {
 
               </div>
 
-              <div className="rounded-lg border bg-cyan-600 p-6 shadow-sm ">
-                <h3 className="mb-2 text-xl text-white font-bold">Find Specialists Near You</h3>
-                <p className="mb-4 text-white">
-                Get precisely matched with board-certified specialists in your area
-  based on your symptoms, medical history, and location through our
-  AI-powered matching system
-                </p>
-                <img
-                src="/location.webp?height=420&width=880"
-                alt="find specialist image"
-                className="w-full max-h-[200px] object-contain mt-4"
-                ></img>
-
-              </div>
             </div>
           </div>
         </section>
@@ -218,7 +199,7 @@ export default function Home() {
           <div className="px-6 pb-6 pt-0 text-gray-600">
             <p>You'll need to describe your symptoms, their duration and severity. For best results, provide:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li>Age and sex</li>
+              <li>Age and gender</li>
               <li>Medical history (existing conditions)</li>
               <li>Current medications</li>
               <li>Allergies</li>

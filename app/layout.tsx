@@ -24,9 +24,6 @@ export default function RootLayout({
                 <Link href="/symptom-checker" className="text-lg font-sans font-semibold hover:underline underline-offset-4">
                   Symptom Checker
                 </Link>
-                <Link href="/find-specialist" className="text-lg font-sans font-semibold hover:underline underline-offset-4">
-                  Find Specialist
-                </Link>
 
               </nav>
             </div>
