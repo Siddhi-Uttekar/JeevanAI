@@ -42,6 +42,10 @@ export default function SymptomChecker() {
     nextQuestion: null
   });
   const [diagnosisComplete, setDiagnosisComplete] = useState(false);
+  const [conditionsInput, setConditionsInput] = useState('');
+  const [medicationsInput, setMedicationsInput] = useState('');
+  const [allergiesInput, setAllergiesInput] = useState('');
+  const [familyHistoryInput, setFamilyHistoryInput] = useState('');
 
   const [step, setStep] = useState<"demographics" | "medicalHistory" | "conversation">("demographics");
 
@@ -127,6 +131,15 @@ export default function SymptomChecker() {
   };
 
   const handleSubmitMedicalHistory = () => {
+    const cleanedMedicalHistory = {
+      ...medicalHistory,
+      conditions: conditionsInput.split(',').map(item => item.trim()).filter(Boolean),
+      medications: medicationsInput.split(',').map(item => item.trim()).filter(Boolean),
+      allergies: allergiesInput.split(',').map(item => item.trim()).filter(Boolean),
+      familyHistory: familyHistoryInput.split(',').map(item => item.trim()).filter(Boolean),
+    };
+    setMedicalHistory(cleanedMedicalHistory);
+
     setStep("conversation");
     setMessages([
       {
@@ -164,6 +177,10 @@ export default function SymptomChecker() {
       alcoholUse: "none",
       familyHistory: [],
     });
+    setConditionsInput('');
+    setMedicationsInput('');
+    setAllergiesInput('');
+    setFamilyHistoryInput('');
     setStep("demographics");
   };
 
@@ -308,11 +325,8 @@ export default function SymptomChecker() {
                   </label>
                   <input
                     type="text"
-                    value={medicalHistory.conditions.join(", ")}
-                    onChange={(e) => setMedicalHistory({
-                      ...medicalHistory,
-                      conditions: e.target.value.split(",").map(item => item.trim()).filter(item => item)
-                    })}
+                    value={conditionsInput}
+                    onChange={(e) => setConditionsInput(e.target.value)}
                     className="w-full p-2 border rounded-md"
                     placeholder="e.g. diabetes, hypertension"
                   />
@@ -324,11 +338,8 @@ export default function SymptomChecker() {
                   </label>
                   <input
                     type="text"
-                    value={medicalHistory.medications.join(", ")}
-                    onChange={(e) => setMedicalHistory({
-                      ...medicalHistory,
-                      medications: e.target.value.split(",").map(item => item.trim()).filter(item => item)
-                    })}
+                    value={medicationsInput}
+                    onChange={(e) => setMedicationsInput(e.target.value)}
                     className="w-full p-2 border rounded-md"
                     placeholder="e.g. ibuprofen, insulin"
                   />
@@ -340,11 +351,8 @@ export default function SymptomChecker() {
                   </label>
                   <input
                     type="text"
-                    value={medicalHistory.allergies.join(", ")}
-                    onChange={(e) => setMedicalHistory({
-                      ...medicalHistory,
-                      allergies: e.target.value.split(",").map(item => item.trim()).filter(item => item)
-                    })}
+                    value={allergiesInput}
+                    onChange={(e) => setAllergiesInput(e.target.value)}
                     className="w-full p-2 border rounded-md"
                     placeholder="e.g. penicillin, nuts"
                   />
@@ -356,11 +364,8 @@ export default function SymptomChecker() {
                   </label>
                   <input
                     type="text"
-                    value={medicalHistory.familyHistory.join(", ")}
-                    onChange={(e) => setMedicalHistory({
-                      ...medicalHistory,
-                      familyHistory: e.target.value.split(",").map(item => item.trim()).filter(item => item)
-                    })}
+                    value={familyHistoryInput}
+                    onChange={(e) => setFamilyHistoryInput(e.target.value)}
                     className="w-full p-2 border rounded-md"
                     placeholder="e.g. heart disease, diabetes"
                   />
