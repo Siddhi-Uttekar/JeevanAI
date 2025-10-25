@@ -42,7 +42,7 @@ export default function SymptomChecker() {
     nextQuestion: null
   });
   const [diagnosisComplete, setDiagnosisComplete] = useState(false);
-  const [useDirectAPI, setUseDirectAPI] = useState(false);
+
   const [step, setStep] = useState<"demographics" | "medicalHistory" | "conversation">("demographics");
 
   const handleUserInput = async () => {
@@ -55,7 +55,7 @@ export default function SymptomChecker() {
     setError(null);
 
     try {
-      const endpoint = useDirectAPI ? "/api/direct-groq" : "/api/analyze-symptoms";
+      const endpoint = "/api/analyze-symptoms";
       console.log(`Calling ${endpoint}`);
 
       const response = await fetch(endpoint, {
@@ -205,21 +205,26 @@ export default function SymptomChecker() {
     }
   };
 
-  const renderCareLevelBadge = (careLevel: string) => {
-    const colors = {
-      "self-care": "bg-green-500 text-white",
-      "primary care": "bg-blue-500 text-white",
-      "specialist": "bg-yellow-500 text-black",
-      "urgent care": "bg-orange-500 text-white",
-      "emergency": "bg-red-500 text-white"
-    };
 
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${colors[careLevel as keyof typeof colors] || "bg-gray-500 text-white"}`}>
-        {careLevel ? careLevel.charAt(0).toUpperCase() + careLevel.slice(1) : ''}
-      </span>
-    );
-  };
+
+  const renderCareLevelBadge = (careLevel: string) => {
+  const color = {
+    "self-care": "bg-green-500",
+    "primary care": "bg-blue-500",
+    "specialist": "bg-yellow-500 text-black",
+    "urgent care": "bg-orange-500",
+    "emergency": "bg-red-500"
+  }[careLevel] || "bg-gray-500";
+
+  const label = careLevel?.[0].toUpperCase() + careLevel?.slice(1);
+
+  return (
+    <span className={`px-2 py-1 rounded-full text-xs font-semibold text-white ${color}`}>
+      {label}
+    </span>
+  );
+};
+
 
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
@@ -233,7 +238,7 @@ export default function SymptomChecker() {
                 Answer questions to get a medical assessment and report.
               </p>
             </div>
-            
+
           </div>
         </div>
 
