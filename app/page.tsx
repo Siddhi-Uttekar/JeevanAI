@@ -179,7 +179,7 @@ export default function Home() {
             </svg>
           </summary>
           <div className="px-6 pb-6 pt-0 text-gray-600">
-            <p>JeevanAI uses advanced AI models like Meta’s LLaMA 3.1 via Groq and optionally DeepSeek, which are informed by general
+            <p>JeevanAI uses advanced AI models like Meta’s LLaMA 3.1 via Groq , which are informed by general
               medical literature but not clinically fine-tuned. While it offers helpful symptom insights, its accuracy is estimated
               around 65–75% for common conditions, depending on input quality. It is meant to assist, not replace, professional medical
               diagnosis.</p>

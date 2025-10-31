@@ -1,6 +1,6 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { MedicalReport, MedicalSpecialty } from "./type";
+import { MedicalReport } from "./type";
 
 // Add this at the top of your generateReport.ts file
 const getLastTablePosition = (doc: jsPDF) => {
@@ -182,3 +182,76 @@ export const generateMedicalReport = (data: MedicalReport) => {
   // Save PDF
   doc.save(`Medical_Report_${data.patientInfo.gender || 'Patient'}_${new Date().toISOString().slice(0,10)}.pdf`);
 };
+// import html2pdf from 'html2pdf.js';
+// import { MedicalReport } from "./type";
+
+// export const generateMedicalReport = (data: MedicalReport) => {
+//   const element = document.createElement("div");
+//   element.innerHTML = `
+//     <style>
+//       body { font-family: sans-serif; }
+//       .container { border: 1px solid #ddd; padding: 20px; margin: 20px; }
+//       h2 { text-align: center; color: #333; }
+//       h3 { color: #555; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;}
+//       ul { list-style-type: none; padding-left: 0; }
+//       li { margin-bottom: 5px; }
+//       .section { margin-bottom: 20px; }
+//       .disclaimer { font-size: 10px; color: gray; text-align: center; margin-top: 30px; }
+//     </style>
+//     <div class="container">
+//       <h2>Medical Symptom Assessment Report</h2>
+//       <p style="text-align:center;">Generated: ${new Date(data.generatedAt).toLocaleString()}</p>
+
+//       <div class="section">
+//         <h3>Patient Information</h3>
+//         <ul>
+//           <li><strong>Age:</strong> ${data.patientInfo.age}</li>
+//           <li><strong>Gender:</strong> ${data.patientInfo.gender || "Not specified"}</li>
+//           <li><strong>Location:</strong> ${data.patientInfo.location || "Not specified"}</li>
+//         </ul>
+//       </div>
+
+//       <div class="section">
+//         <h3>Medical History</h3>
+//         <ul>
+//           <li><strong>Conditions:</strong> ${data.medicalHistory.conditions.join(", ") || "None"}</li>
+//           <li><strong>Medications:</strong> ${data.medicalHistory.medications.join(", ") || "None"}</li>
+//           <li><strong>Allergies:</strong> ${data.medicalHistory.allergies.join(", ") || "None"}</li>
+//         </ul>
+//       </div>
+
+//       <div class="section">
+//         <h3>Symptoms</h3>
+//         ${data.symptoms.length ? `
+//           <ul>${data.symptoms.map(s => `<li><strong>${s.name}</strong> (${s.duration}, ${s.severity}/10): ${s.description}</li>`).join("")}</ul>
+//         ` : `<p>No symptoms reported</p>`}
+//       </div>
+
+//       <div class="section">
+//         <h3>Assessment</h3>
+//         ${data.assessment.conditions.length ? `
+//           <p>${data.assessment.reasoning}</p>
+//           <ul>${data.assessment.conditions.map(c => `<li><strong>${c.name}:</strong> ${Math.round(c.probability * 100)}%</li>`).join("")}</ul>
+//         ` : `<p>No conditions identified</p>`}
+//       </div>
+
+//       <div class="section">
+//         <h3>Recommendations</h3>
+//         <ul>${(data.assessment.recommendations.length ? data.assessment.recommendations : ["No specific recommendations"]).map((r, i) => `<li>${i + 1}. ${r}</li>`).join("")}</ul>
+//       </div>
+
+//       ${data.doctorRecommendation ? `
+//         <div class="section">
+//           <h3>Recommended Specialist</h3>
+//           <p><strong>${data.doctorRecommendation.specialty}</strong><br>
+//           ${data.doctorRecommendation.reason}<br>
+//           Urgency: ${data.doctorRecommendation.urgency.toUpperCase()}</p>
+//         </div>
+//       ` : ""}
+
+//       <p class="disclaimer">Disclaimer: This report is for informational purposes only and does not constitute medical advice.</p>
+//     </div>
+//   `;
+
+//   html2pdf().from(element).save(`Medical_Report_${data.patientInfo.gender || 'Patient'}_${new Date().toISOString().slice(0,10)}.pdf`);
+// };
